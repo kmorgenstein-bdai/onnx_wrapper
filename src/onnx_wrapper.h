@@ -52,7 +52,7 @@ void prettyPrint(T input, int color = printColors::black)
 class OnnxWrapper {
     public:
         OnnxWrapper();
-        void initialize(); //const std::string& config_path
+        void initialize(const std::string& config_path);
         void run();
     protected:
         std::string model;

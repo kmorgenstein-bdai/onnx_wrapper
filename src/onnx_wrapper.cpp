@@ -4,14 +4,12 @@
 // Constructor
 OnnxWrapper::OnnxWrapper()
 {
-    initialize();
     prettyPrint("[OnnxWrapper] OnnxWrapper Constructed", printColors::green);
 }
 
 // Initializer
-void OnnxWrapper::initialize()
+void OnnxWrapper::initialize(const std::string& config_path)
 {
-    const std::string& config_path = "/home/kmorgenstein/BDAI/inference_test/onnx_config.yaml";
     ParamHandler paramHandler(config_path);
     if (!paramHandler.fileOpenedSuccessfully())
     {
