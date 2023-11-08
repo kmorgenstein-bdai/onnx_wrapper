@@ -55,8 +55,6 @@ class OnnxWrapper {
         void run();
     protected:
         std::string model;
-        int input_dim, output_dim;
-
     private:
         // ORT Environment
         std::shared_ptr<Ort::Env> envPtr;
@@ -71,7 +69,6 @@ class OnnxWrapper {
         // Outputs
         char* outputNamePtr;
         std::vector<int64_t> outputDims;
-
 
 };
 

@@ -22,14 +22,10 @@ void OnnxWrapper::initialize(const std::string& config_path)
     for (auto& key : keys)
     {
         if (key == "model"){std::string output; paramHandler.getValue(key, output); model = output; continue;}
-        if (key == "input_dim"){double output; paramHandler.getValue(key, output); input_dim = (int) output; continue;}
-        if (key == "output_dim"){double output; paramHandler.getValue(key, output); output_dim = (int) output; continue;}
     }
 
     // test that yaml is read correctly - delete once it works
     std::cout << model << std::endl;
-    std::cout << input_dim << std::endl;
-    std::cout << output_dim << std::endl;
 
     // Create ORT Environment
     std::string instanceName{"ONNX Wrapper"};
@@ -70,4 +66,9 @@ void OnnxWrapper::initialize(const std::string& config_path)
 
     prettyPrint("[OnnxWrapper] Policy Initialized", printColors::green);
     return;
+}
+
+void OnnxWrapper::run() //need to add input and output data types
+{
+
 }
