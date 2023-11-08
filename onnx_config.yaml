@@ -1,0 +1,3 @@
+model: "/home/kmorgenstein/BDAI/inference_test/models/script.onnx"
+input_dim: 48
+output_dim: 12
