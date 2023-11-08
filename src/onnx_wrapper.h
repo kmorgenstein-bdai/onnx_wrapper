@@ -8,7 +8,6 @@
 #include <filesystem>
 #include <onnxruntime_cxx_api.h>
 
-
 template <typename T>
 size_t vectorProduct(const std::vector<T>& v)
 {
@@ -60,18 +59,18 @@ class OnnxWrapper {
 
     private:
         // ORT Environment
-        std::shared_ptr<Ort::Env> EnvPtr;
+        std::shared_ptr<Ort::Env> envPtr;
 
         // Session
-        std::shared_ptr<Ort::Session> SessionPtr;
+        std::shared_ptr<Ort::Session> sessionPtr;
 
         // Inputs
-        char* InputNamePtr;
-        std::vector<int64_t> InputDimsPtr;
+        char* inputNamePtr;
+        std::vector<int64_t> inputDims;
 
         // Outputs
-        char* OutputNamePtr;
-        std::vector<int64_t> OutputDimsPtr;
+        char* outputNamePtr;
+        std::vector<int64_t> outputDims;
 
 
 };
