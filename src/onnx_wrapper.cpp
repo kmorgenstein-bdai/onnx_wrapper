@@ -9,7 +9,7 @@ OnnxWrapper::OnnxWrapper(const std::string model_path)
 
     // Create ORT Session
     Ort::SessionOptions sessionOptions;
-    // sessionOptions.AppendExecutionProvider_CUDA(OrtCUDAProviderOptions{}); //Enable CUDA
+    // sessionOptions.AppendExecutionProvider_CUDA(OrtCUDAProviderOptions{}); //Enable CUDA (currently unused)
     sessionOptions.SetIntraOpNumThreads(1); //Set Threads
     sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL); //Enable Optimizations
     // Available levels are
@@ -22,18 +22,18 @@ OnnxWrapper::OnnxWrapper(const std::string model_path)
     sessionPtr = std::make_shared<Ort::Session>(*envPtr, model_path.c_str(), sessionOptions); //Load the ONNX Model
 
     // Input Info
-    size_t numInputNodes = sessionPtr->GetInputCount(); //Number of Input Nodes
+    //size_t numInputNodes = sessionPtr->GetInputCount(); //Number of Input Nodes (currently unused)
     Ort::TypeInfo inputTypeInfo = sessionPtr->GetInputTypeInfo(0); //Input Type Info
     auto inputTensorInfo = inputTypeInfo.GetTensorTypeAndShapeInfo(); //Input Tensor Info
-    ONNXTensorElementDataType inputType = inputTensorInfo.GetElementType(); //Input Type
+    //ONNXTensorElementDataType inputType = inputTensorInfo.GetElementType(); //Input Type (currently unused)
     inputDims = inputTensorInfo.GetShape(); //Input Dims
     if (inputDims.at(0) != 1){inputDims.at(0) = 1;} //Set Batch Size = 1
 
     // Output Info
-    size_t numOutputNodes = sessionPtr->GetOutputCount(); //Number of Output Nodes
+    //size_t numOutputNodes = sessionPtr->GetOutputCount(); //Number of Output Nodes (currently unused)
     Ort::TypeInfo outputTypeInfo = sessionPtr->GetOutputTypeInfo(0); //Output Type Info
     auto outputTensorInfo = outputTypeInfo.GetTensorTypeAndShapeInfo(); //Output Tensor Info
-    ONNXTensorElementDataType outputType = outputTensorInfo.GetElementType(); //Output Type
+    //ONNXTensorElementDataType outputType = outputTensorInfo.GetElementType(); //Output Type (currently unused)
     outputDims = outputTensorInfo.GetShape(); //Output Dims
     if (outputDims.at(0) != 1){outputDims.at(0) = 1;} //Set Batch Size = 1
 
