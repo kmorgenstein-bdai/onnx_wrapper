@@ -8,25 +8,8 @@ OnnxWrapper::OnnxWrapper()
 }
 
 // Initializer
-void OnnxWrapper::initialize(const std::string& config_path)
+void OnnxWrapper::initialize(const std::string model_path)
 {
-    ParamHandler paramHandler(config_path);
-    if (!paramHandler.fileOpenedSuccessfully())
-    {
-        prettyPrint("[OnnxWrapper] Bad configuration file", printColors::red);
-        exit(1);
-    }
-
-    // Read Keys from YAML file
-    std::vector<std::string> keys = paramHandler.getKeys();
-    for (auto& key : keys)
-    {
-        if (key == "model"){std::string output; paramHandler.getValue(key, output); model = output; continue;}
-    }
-
-    // test that yaml is read correctly - delete once it works
-    std::cout << model << std::endl;
-
     // Create ORT Environment
     std::string instanceName{"ONNX Wrapper"};
     envPtr = std::make_shared<Ort::Env>(OrtLoggingLevel::ORT_LOGGING_LEVEL_WARNING, instanceName.c_str());
@@ -43,21 +26,23 @@ void OnnxWrapper::initialize(const std::string& config_path)
     // ORT_ENABLE_EXTENDED -> To enable extended optimizations
     // (Includes level 1 + more complex optimizations like node fusions)
     // ORT_ENABLE_ALL -> To Enable All possible optimizations
-    sessionPtr = std::make_shared<Ort::Session>(*envPtr, model.c_str(), sessionOptions); //Load the ONNX Model
+    sessionPtr = std::make_shared<Ort::Session>(*envPtr, model_path.c_str(), sessionOptions); //Load the ONNX Model
 
     // Create Allocator
     Ort::AllocatorWithDefaultOptions allocator;
 
     // Input Info
     size_t numInputNodes = sessionPtr->GetInputCount(); //Number of Input Nodes
+    inputNamePtr = sessionPtr->GetInputNameAllocated(0, allocator); //Input Name
     Ort::TypeInfo inputTypeInfo = sessionPtr->GetInputTypeInfo(0); //Input Type Info
     auto inputTensorInfo = inputTypeInfo.GetTensorTypeAndShapeInfo(); //Input Tensor Info
     ONNXTensorElementDataType inputType = inputTensorInfo.GetElementType(); //Input Type
     inputDims = inputTensorInfo.GetShape(); //Input Dims
     if (inputDims.at(0) != 1){inputDims.at(0) = 1;} //Set Batch Size = 1
 
-    //Output Info
+    // Output Info
     size_t numOutputNodes = sessionPtr->GetOutputCount(); //Number of Output Nodes
+    outputNamePtr = sessionPtr->GetOutputNameAllocated(0, allocator); //Output Name
     Ort::TypeInfo outputTypeInfo = sessionPtr->GetOutputTypeInfo(0); //Output Type Info
     auto outputTensorInfo = outputTypeInfo.GetTensorTypeAndShapeInfo(); //Output Tensor Info
     ONNXTensorElementDataType outputType = outputTensorInfo.GetElementType(); //Output Type
@@ -68,7 +53,25 @@ void OnnxWrapper::initialize(const std::string& config_path)
     return;
 }
 
-void OnnxWrapper::run() //need to add input and output data types
+void OnnxWrapper::run(std::vector<double> inputData)
 {
+    // Inputs
+    size_t inputTensorSize = vectorProduct(inputDims);
+    std::vector<float> inputTensorValues(inputTensorSize);
+    inputTensorValues.assign(inputData.begin(), inputData.end());
+    std::vector<Ort::Value> inputTensors;
+    Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
+    inputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, inputTensorValues.data(), inputTensorSize, inputDims.data(), inputDims.size()));
+
+    // Outputs
+    size_t outputTensorSize = vectorProduct(outputDims);
+    std::vector<float> outputTensorValues(outputTensorSize);
+    std::vector<Ort::Value> outputTensors;
+    outputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, outputTensorValues.data(), outputTensorSize, outputDims.data(), outputDims.size()));
+
+    // Inference
+    std::vector<const char*> inputNames{inputNamePtr.release()};
+    std::vector<const char*> outputNames{outputNamePtr.release()};
+    sessionPtr->Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(), 1, outputNames.data(), outputTensors.data(), 1);
 
 }
