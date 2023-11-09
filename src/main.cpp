@@ -6,13 +6,14 @@
 
 int main(int argc, char **argv) 
 {
-    const std::string model_path = "../models/script.onnx";
+    std::string file_path {__FILE__};
+    const std::string model_path = file_path.substr(0, file_path.rfind("/")) + "/models/dummy.onnx";
     OnnxWrapper wrapper(model_path);
 
     std::vector<double> input(48); //Number of Inputs
     std::vector<float> time;
     std::vector<float> freq;
-    int N = 100000; //Number of Test Iterations
+    int N = 1000; //Number of Test Iterations
     for (auto i = 0; i < N; ++i)
     {
         auto start = std::chrono::high_resolution_clock::now();
