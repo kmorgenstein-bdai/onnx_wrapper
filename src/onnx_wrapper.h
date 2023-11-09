@@ -50,8 +50,7 @@ void prettyPrint(T input, int color = printColors::black)
 
 class OnnxWrapper {
     public:
-        OnnxWrapper();
-        void initialize(const std::string model_path);
+        OnnxWrapper(const std::string model_path);
         void run(std::vector<double> inputData);
     private:
         // ORT Environment
@@ -60,12 +59,13 @@ class OnnxWrapper {
         // Session
         std::shared_ptr<Ort::Session> sessionPtr;
 
+        // Allocator
+        Ort::AllocatorWithDefaultOptions allocator;
+
         // Inputs
-        Ort::AllocatedStringPtr inputNamePtr;
         std::vector<int64_t> inputDims;
 
         // Outputs
-        Ort::AllocatedStringPtr outputNamePtr;
         std::vector<int64_t> outputDims;
 
 };
