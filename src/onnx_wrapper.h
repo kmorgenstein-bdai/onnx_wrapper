@@ -51,7 +51,7 @@ void prettyPrint(T input, int color = printColors::black)
 class OnnxWrapper {
     public:
         OnnxWrapper(const std::string model_path);
-        void run(std::vector<double> inputData);
+        std::vector<double> run(std::vector<double> inputData);
     private:
         // ORT Environment
         std::shared_ptr<Ort::Env> envPtr;
@@ -67,7 +67,6 @@ class OnnxWrapper {
 
         // Outputs
         std::vector<int64_t> outputDims;
-
 };
 
 # endif

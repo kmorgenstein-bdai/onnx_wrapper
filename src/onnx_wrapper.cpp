@@ -41,7 +41,7 @@ OnnxWrapper::OnnxWrapper(const std::string model_path)
     return;
 }
 
-void OnnxWrapper::run(std::vector<double> inputData)
+std::vector<double> OnnxWrapper::run(std::vector<double> inputData)
 {
     // Memory Info
     Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
@@ -62,8 +62,13 @@ void OnnxWrapper::run(std::vector<double> inputData)
     std::vector<float> outputTensorValues(outputTensorSize); //Create Output Value Tensor
     std::vector<Ort::Value> outputTensors; //Create Output ORT Tensor
     outputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, outputTensorValues.data(), outputTensorSize, outputDims.data(), outputDims.size())); //Fill Output ORT Tensor
-    
 
     // Inference
-    sessionPtr->Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(), 1, outputNames.data(), outputTensors.data(), 1);
+    sessionPtr->Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(), 1, outputNames.data(), outputTensors.data(), 1); //1 Input + 1 Output
+
+    // Post Processing
+    std::vector<double> output(outputTensorSize); //Create Output Values Vector
+    output.assign(outputTensorValues.begin(), outputTensorValues.end()); //Fill Output Values Vector
+
+    return output;
 }
