@@ -1,8 +1,10 @@
 #include "onnx_wrapper.h"
-#include <ParamHandler.hpp> 
+
 
 // Constructor
 OnnxWrapper::OnnxWrapper()
+: inputNamePtr(nullptr, Ort::detail::AllocatedFree(nullptr)),
+  outputNamePtr(nullptr, Ort::detail::AllocatedFree(nullptr))
 {
     prettyPrint("[OnnxWrapper] OnnxWrapper Created", printColors::green);
 }
@@ -73,5 +75,4 @@ void OnnxWrapper::run(std::vector<double> inputData)
     std::vector<const char*> inputNames{inputNamePtr.release()};
     std::vector<const char*> outputNames{outputNamePtr.release()};
     sessionPtr->Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(), 1, outputNames.data(), outputTensors.data(), 1);
-
 }

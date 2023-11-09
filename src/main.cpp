@@ -3,7 +3,7 @@
 int main(int argc, char **argv) 
 {
     OnnxWrapper wrapper;
-    const std::string& config_path = "/home/kmorgenstein/BDAI/onnx_wrapper/src/onnx_config.yaml";
-    wrapper.initialize(config_path);
+    const std::string model_path = "/home/kmorgenstein/BDAI/onnx_wrapper/models/script.onnx";
+    wrapper.initialize(model_path);
     return 0;
 }

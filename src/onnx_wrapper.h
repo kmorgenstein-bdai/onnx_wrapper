@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <numeric>
-#include <filesystem>
+#include <cstddef>
 #include <onnxruntime_cxx_api.h>
 
 template <typename T>
