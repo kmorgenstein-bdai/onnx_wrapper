@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv) 
 {
-    const std::string model_path = "/home/kmorgenstein/BDAI/onnx_wrapper/models/script.onnx";
+    const std::string model_path = "../models/script.onnx";
     OnnxWrapper wrapper(model_path);
 
     std::vector<double> input(48); //Number of Inputs
