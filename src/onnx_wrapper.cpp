@@ -1,6 +1,5 @@
 #include "onnx_wrapper.h"
 
-
 // Constructor
 OnnxWrapper::OnnxWrapper(const std::string model_path)
 {
@@ -21,9 +20,6 @@ OnnxWrapper::OnnxWrapper(const std::string model_path)
     // (Includes level 1 + more complex optimizations like node fusions)
     // ORT_ENABLE_ALL -> To Enable All possible optimizations
     sessionPtr = std::make_shared<Ort::Session>(*envPtr, model_path.c_str(), sessionOptions); //Load the ONNX Model
-
-    // Create Allocator
-    //Ort::AllocatorWithDefaultOptions allocator;
 
     // Input Info
     size_t numInputNodes = sessionPtr->GetInputCount(); //Number of Input Nodes
@@ -47,24 +43,27 @@ OnnxWrapper::OnnxWrapper(const std::string model_path)
 
 void OnnxWrapper::run(std::vector<double> inputData)
 {
-    // Inputs
-    size_t inputTensorSize = vectorProduct(inputDims);
-    std::vector<float> inputTensorValues(inputTensorSize);
-    inputTensorValues.assign(inputData.begin(), inputData.end());
-    std::vector<Ort::Value> inputTensors;
+    // Memory Info
     Ort::MemoryInfo memoryInfo = Ort::MemoryInfo::CreateCpu(OrtAllocatorType::OrtArenaAllocator, OrtMemType::OrtMemTypeDefault);
-    inputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, inputTensorValues.data(), inputTensorSize, inputDims.data(), inputDims.size()));
-    Ort::AllocatedStringPtr inputNamePtr = sessionPtr->GetInputNameAllocated(0, allocator); //Input Name
 
+    // Inputs
+    Ort::AllocatedStringPtr inputNamePtr = sessionPtr->GetInputNameAllocated(0, allocator); //Input Name Ptr
+    std::vector<const char*> inputNames{inputNamePtr.release()}; //Input Name
+    size_t inputTensorSize = vectorProduct(inputDims); //Input Tensor Size
+    std::vector<float> inputTensorValues(inputTensorSize); //Create Input Values Tensor
+    inputTensorValues.assign(inputData.begin(), inputData.end()); //Fill Input Values Tensor
+    std::vector<Ort::Value> inputTensors; //Create Input ORT Tensor
+    inputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, inputTensorValues.data(), inputTensorSize, inputDims.data(), inputDims.size())); //Fill Input ORT Tensor
+    
     // Outputs
-    size_t outputTensorSize = vectorProduct(outputDims);
-    std::vector<float> outputTensorValues(outputTensorSize);
-    std::vector<Ort::Value> outputTensors;
-    outputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, outputTensorValues.data(), outputTensorSize, outputDims.data(), outputDims.size()));
-    Ort::AllocatedStringPtr outputNamePtr = sessionPtr->GetOutputNameAllocated(0, allocator); //Input Name
+    Ort::AllocatedStringPtr outputNamePtr = sessionPtr->GetOutputNameAllocated(0, allocator); //Output Name Ptr
+    std::vector<const char*> outputNames{outputNamePtr.release()}; //Output Name
+    size_t outputTensorSize = vectorProduct(outputDims); //Output Tensor Size
+    std::vector<float> outputTensorValues(outputTensorSize); //Create Output Value Tensor
+    std::vector<Ort::Value> outputTensors; //Create Output ORT Tensor
+    outputTensors.push_back(Ort::Value::CreateTensor<float>(memoryInfo, outputTensorValues.data(), outputTensorSize, outputDims.data(), outputDims.size())); //Fill Output ORT Tensor
+    
 
     // Inference
-    std::vector<const char*> inputNames{inputNamePtr.release()};
-    std::vector<const char*> outputNames{outputNamePtr.release()};
     sessionPtr->Run(Ort::RunOptions{nullptr}, inputNames.data(), inputTensors.data(), 1, outputNames.data(), outputTensors.data(), 1);
 }
