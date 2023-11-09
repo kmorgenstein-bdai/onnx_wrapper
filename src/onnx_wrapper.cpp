@@ -1,7 +1,7 @@
 #include "onnx_wrapper.h"
 
 // Constructor
-OnnxWrapper::OnnxWrapper(const std::string model_path)
+OnnxWrapper::OnnxWrapper(const std::string modelPath)
 {
     // Create ORT Environment
     std::string instanceName{"ONNX Wrapper"};
@@ -19,7 +19,7 @@ OnnxWrapper::OnnxWrapper(const std::string model_path)
     // ORT_ENABLE_EXTENDED -> To enable extended optimizations
     // (Includes level 1 + more complex optimizations like node fusions)
     // ORT_ENABLE_ALL -> To Enable All possible optimizations
-    sessionPtr = std::make_shared<Ort::Session>(*envPtr, model_path.c_str(), sessionOptions); //Load the ONNX Model
+    sessionPtr = std::make_shared<Ort::Session>(*envPtr, modelPath.c_str(), sessionOptions); //Load the ONNX Model
 
     // Input Info
     //size_t numInputNodes = sessionPtr->GetInputCount(); //Number of Input Nodes (currently unused)

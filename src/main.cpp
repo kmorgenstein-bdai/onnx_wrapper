@@ -6,14 +6,15 @@
 
 int main(int argc, char **argv) 
 {
-    std::string file_path {__FILE__};
-    const std::string model_path = file_path.substr(0, file_path.rfind("/")) + "/models/dummy.onnx";
-    OnnxWrapper wrapper(model_path);
+    std::string filePath {__FILE__};
+    const std::string modelPath = filePath.substr(0, filePath.rfind("/")) + "/models/dummy.onnx";
+    OnnxWrapper wrapper(modelPath);
 
     std::vector<double> input(48); //Number of Inputs
     std::vector<float> time;
     std::vector<float> freq;
     int N = 1000; //Number of Test Iterations
+    prettyPrint("[OnnxWrapper] Running Inference for " + std::to_string(N) + " Iterations", printColors::yellow);
     for (auto i = 0; i < N; ++i)
     {
         auto start = std::chrono::high_resolution_clock::now();
@@ -27,8 +28,8 @@ int main(int argc, char **argv)
     float mean = std::reduce(time.begin(), time.end()) / count / 1000000000; //nsec to sec
     float mean_hz = std::reduce(freq.begin(), freq.end()) / count;
 
-    std::cout << "Mean Inference Time: " << mean << " s" << std::endl;
-    std::cout << "Mean Hz: " << mean_hz << " Hz" << std::endl;
+    prettyPrint("[OnnxWrapper] Mean Inference Time: " + std::to_string(mean) + " s", printColors::yellow);
+    prettyPrint("[OnnxWrapper] Mean Inference Frequency: " + std::to_string(mean_hz) + " Hz", printColors::yellow);
 
     return 0;
 }

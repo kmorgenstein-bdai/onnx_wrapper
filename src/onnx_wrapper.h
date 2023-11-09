@@ -50,7 +50,7 @@ void prettyPrint(T input, int color = printColors::black)
 
 class OnnxWrapper {
     public:
-        OnnxWrapper(const std::string model_path);
+        OnnxWrapper(const std::string modelPath);
         std::vector<double> run(std::vector<double> inputData);
     private:
         // ORT Environment
